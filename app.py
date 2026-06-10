@@ -2,7 +2,6 @@ import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 import os
-
 # ---------------- PAGE CONFIG ----------------
 
 st.set_page_config(
