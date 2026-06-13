@@ -3,13 +3,10 @@ import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 import os
-<<<<<<< HEAD
-=======
 
 # Load environment variables
 load_dotenv()
 
->>>>>>> 9c3d0bf (Added chatbot, multilingual support, download reports and AI modes)
 # ---------------- PAGE CONFIG ----------------
 
 st.set_page_config(
@@ -338,7 +335,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-<<<<<<< HEAD
-=======
-
->>>>>>> 9c3d0bf (Added chatbot, multilingual support, download reports and AI modes)
