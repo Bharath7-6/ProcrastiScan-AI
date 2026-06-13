@@ -1,7 +1,15 @@
+
 import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
 import os
+<<<<<<< HEAD
+=======
+
+# Load environment variables
+load_dotenv()
+
+>>>>>>> 9c3d0bf (Added chatbot, multilingual support, download reports and AI modes)
 # ---------------- PAGE CONFIG ----------------
 
 st.set_page_config(
@@ -69,14 +77,64 @@ st.image(
     width=90
 )
 
-# ---------------- GROQ SETUP ----------------
+# ---------------- LANGUAGE ----------------
 
-load_dotenv()
-
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+language = st.sidebar.selectbox(
+    "🌐 Language",
+    ["English", "తెలుగు", "हिन्दी"]
 )
 
+if language == "English":
+    text = {
+        "title": "🚀 AI-Powered Productivity Analyzer",
+        "info": "Enter a task and receive personalized productivity insights and action plans.",
+        "task": "📌 What task are you avoiding?",
+        "deadline": "⏳ Deadline",
+        "difficulty": "⚡ Difficulty",
+        "button": "🚀 Analyze My Productivity",
+        "insights": "🧠 AI Insights",
+        "lang_prompt": "Respond ONLY in English language. Do not use English except for technical terms."
+    }
+
+elif language == "తెలుగు":
+    text = {
+        "title": "🚀 AI ఆధారిత ఉత్పాదకత విశ్లేషణ",
+        "info": "మీ పనిని నమోదు చేసి ఉత్పాదకత సూచనలు పొందండి.",
+        "task": "📌 మీరు ఏ పనిని వాయిదా వేస్తున్నారు?",
+        "deadline": "⏳ గడువు",
+        "difficulty": "⚡ కష్టతరం",
+        "button": "🚀 నా ఉత్పాదకతను విశ్లేషించు",
+        "insights": "🧠 AI సూచనలు",
+        "lang_prompt": "Respond ONLY in Telugu language. Do not use English except for technical terms."
+    }
+
+else:
+    text = {
+        "title": "🚀 AI आधारित उत्पादकता विश्लेषक",
+        "info": "अपना कार्य दर्ज करें और उत्पादकता सुझाव प्राप्त करें।",
+        "task": "📌 आप किस कार्य को टाल रहे हैं?",
+        "deadline": "⏳ समय सीमा",
+        "difficulty": "⚡ कठिनाई",
+        "button": "🚀 मेरी उत्पादकता का विश्लेषण करें",
+        "insights": "🧠 AI सुझाव",
+        "lang_prompt": "Respond ONLY in Hindi language. Do not use English except for technical terms."
+    }
+mode = st.sidebar.selectbox(
+    "🎭 AI Mode",
+    ["Normal", "Funny", "Strict"]
+)
+# ---------------- API KEY ----------------
+
+default_key = os.getenv("GROQ_API_KEY")
+
+user_key = st.sidebar.text_input(
+    "🔑 Enter Groq API Key (Optional)",
+    type="password"
+)
+
+api_key = user_key if user_key else default_key
+
+client = Groq(api_key=api_key)
 
 # ---------------- SIDEBAR ----------------
 
@@ -100,17 +158,15 @@ with st.sidebar:
 
 # ---------------- MAIN CONTENT ----------------
 
-st.markdown("### 🚀 AI-Powered Productivity Analyzer")
+st.markdown(f"### {text['title']}")
 
-st.info(
-    "Enter a task and receive personalized productivity insights and action plans."
-)
+st.info(text["info"])
 
-task = st.text_input("📌 What task are you avoiding?")
-deadline = st.text_input("⏳ Deadline")
+task = st.text_input(text["task"])
+deadline = st.text_input(text["deadline"])
 
 difficulty = st.selectbox(
-    "⚡ Difficulty",
+    text["difficulty"],
     ["Easy", "Medium", "Hard"]
 )
 
@@ -127,11 +183,9 @@ else:
 
 # ---------------- ANALYSIS BUTTON ----------------
 
-if st.button("🚀 Analyze My Productivity"):
+if st.button(text["button"]):
 
     with st.spinner("Analyzing your productivity patterns..."):
-
-        st.toast("🧠 AI is analyzing your productivity...")
 
         prompt = f"""
 You are ProcrastiScan AI.
@@ -139,6 +193,13 @@ You are ProcrastiScan AI.
 Task: {task}
 Deadline: {deadline}
 Difficulty: {difficulty}
+Mode: {mode}
+
+{text["lang_prompt"]}
+
+If mode is Funny, give humorous productivity advice.
+If mode is Strict, act like a strict productivity coach.
+If mode is Normal, act like a balanced productivity mentor.
 
 Provide:
 
@@ -162,31 +223,22 @@ Keep it concise, helpful and fun.
             ]
         )
 
-    # ---------------- DASHBOARD METRICS ----------------
+    # Dashboard
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(
-            label="🤖 AI Confidence",
-            value="95%"
-        )
+        st.metric("🤖 AI Confidence", "95%")
 
     with col2:
-        st.metric(
-            label="🧠 Analysis",
-            value="Ready"
-        )
+        st.metric("🧠 Analysis", "Ready")
 
     with col3:
-        st.metric(
-            label="⚡ Status",
-            value="Active"
-        )
+        st.metric("⚡ Status", "Active")
 
     st.markdown("---")
 
-    # ---------------- PRODUCTIVITY ASSESSMENT ----------------
+    # Productivity Assessment
 
     st.subheader("📊 Productivity Assessment")
 
@@ -196,27 +248,80 @@ Keep it concise, helpful and fun.
 
     if score > 70:
         st.error("🔴 High Improvement Opportunity")
-
     elif score > 40:
         st.warning("🟡 Moderate Improvement Opportunity")
-
     else:
         st.success("🟢 Strong Productivity Habits")
 
     st.markdown("---")
 
-    # ---------------- AI INSIGHTS ----------------
+    # AI Insights
 
-    st.subheader("🧠 AI Insights")
+    st.subheader(text["insights"])
 
     st.write(response.choices[0].message.content)
-
+    st.download_button(
+    label="📥 Download Report",
+    data=response.choices[0].message.content,
+    file_name="ProcrastiScan_Report.txt",
+    mime="text/plain"
+)
+    st.session_state["analysis"] = response.choices[0].message.content
     st.markdown("---")
 
     st.success(
         "💡 Remember: Starting badly is better than not starting at all."
     )
+# ---------------- CHATBOT ----------------
 
+st.markdown("---")
+st.subheader("💬 Chat with ProcrastiScan AI")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
+
+user_message = st.chat_input("Ask a follow-up question...")
+
+if user_message:
+
+    st.session_state.messages.append(
+        {"role": "user", "content": user_message}
+    )
+
+    chat_response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {
+                "role": "system",
+               "content": f"""
+You are ProcrastiScan AI.
+
+{text["lang_prompt"]}
+
+Previous Analysis:
+{st.session_state.get("analysis", "")}
+
+The user previously analyzed a productivity task.
+Use the previous analysis when answering follow-up questions.
+Help with study plans, productivity advice,
+motivation, scheduling, and follow-up questions.
+"""
+            },
+            *st.session_state.messages
+        ]
+    )
+
+    answer = chat_response.choices[0].message.content
+
+    st.session_state.messages.append(
+        {"role": "assistant", "content": answer}
+    )
+
+    st.rerun()
 # ---------------- FOOTER ----------------
 
 st.markdown("---")
@@ -233,3 +338,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9c3d0bf (Added chatbot, multilingual support, download reports and AI modes)
